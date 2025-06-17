@@ -1,0 +1,88 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Environment variables
+.env
+.env.local
+.env.production
+deploy/.env
+
+# Database
+*.db
+*.sqlite
+
+# Temporary files
+*.tmp
+*.temp
+
+# System and cache files
+.nvm/
+.cache/
+.npm/
+.ssh/
+.bash_history
+.claude.json
+.claude/
+.lesshst
+.wget-hsts
+.profile
+.bashrc
+.config/
+.cloud-locale-test.skip
+.memory
+api-key.txt
+snap/
+.local/
+
+# Only keep essential project files
+!src/
+!database/
+!deploy/docker-compose.yml
+!tests/
+!.github/
+!docs/
+!PRD/
+!requirements.txt
+!docker-compose.yml
+!Dockerfile
+!litellm-config.yaml
+!litellm-config-direct.yaml
+!*.md

@@ -1,0 +1,141 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_USER: litellm_user
+          POSTGRES_DB: litellm_connection_management
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10, 3.11]
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov pytest-asyncio
+    
+    - name: Initialize database
+      run: |
+        PGPASSWORD=test_password psql -h localhost -U litellm_user -d litellm_connection_management -c "CREATE EXTENSION IF NOT EXISTS pgcrypto;"
+        for script in database/init/*.sql; do
+          if [ -f "$script" ]; then
+            PGPASSWORD=test_password psql -h localhost -U litellm_user -d litellm_connection_management -f "$script"
+          fi
+        done
+      env:
+        POSTGRES_HOST: localhost
+        POSTGRES_PORT: 5432
+        POSTGRES_USER: litellm_user
+        POSTGRES_PASSWORD: test_password
+        POSTGRES_DB: litellm_connection_management
+    
+    - name: Run tests
+      run: |
+        pytest --cov=src --cov-report=xml --cov-report=html
+      env:
+        DATABASE_URL: postgresql://litellm_user:test_password@localhost:5432/litellm_connection_management
+        REDIS_URL: redis://localhost:6379
+        ENVIRONMENT: test
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.11
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install black isort flake8 mypy
+        pip install -r requirements.txt
+    
+    - name: Run black
+      run: black --check src/ tests/
+    
+    - name: Run isort
+      run: isort --check-only src/ tests/
+    
+    - name: Run flake8
+      run: flake8 src/ tests/
+    
+    - name: Run mypy
+      run: mypy src/
+
+  security:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+    
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
