@@ -65,7 +65,7 @@ class AccessPolicy(Base, TimestampMixin):
     
     # Custom permissions and metadata
     custom_permissions: Mapped[Dict[str, Any]] = mapped_column(JSONB, default=dict)
-    metadata: Mapped[Dict[str, Any]] = mapped_column(JSONB, default=dict)
+    policy_metadata: Mapped[Dict[str, Any]] = mapped_column(JSONB, default=dict)
     
     is_system_policy: Mapped[bool] = mapped_column(Boolean, default=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, index=True)

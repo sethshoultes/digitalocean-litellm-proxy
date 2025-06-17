@@ -36,7 +36,7 @@ class PolicyCreate(PolicyBase):
     allowed_hours_end: Optional[int] = Field(None, ge=0, le=23)
     allowed_days: Optional[List[int]] = Field(None, min_items=1, max_items=7)
     custom_permissions: Optional[Dict[str, Any]] = None
-    metadata: Optional[Dict[str, Any]] = None
+    policy_metadata: Optional[Dict[str, Any]] = None
 
 
 class PolicyUpdate(BaseModel):
@@ -64,7 +64,7 @@ class PolicyUpdate(BaseModel):
     allowed_hours_end: Optional[int] = Field(None, ge=0, le=23)
     allowed_days: Optional[List[int]] = Field(None, min_items=1, max_items=7)
     custom_permissions: Optional[Dict[str, Any]] = None
-    metadata: Optional[Dict[str, Any]] = None
+    policy_metadata: Optional[Dict[str, Any]] = None
     is_active: Optional[bool] = None
 
 

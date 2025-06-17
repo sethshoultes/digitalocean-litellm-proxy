@@ -15,7 +15,7 @@ class ConnectionBase(BaseModel):
     connection_name: str = Field(..., min_length=3, max_length=255)
     provider: ProviderType
     configuration: Dict[str, Any]
-    metadata: Optional[Dict[str, Any]] = None
+    connection_metadata: Optional[Dict[str, Any]] = None
 
 
 class ConnectionCreate(ConnectionBase):
@@ -28,7 +28,7 @@ class ConnectionUpdate(BaseModel):
     """Connection update schema."""
     connection_name: Optional[str] = Field(None, min_length=3, max_length=255)
     configuration: Optional[Dict[str, Any]] = None
-    metadata: Optional[Dict[str, Any]] = None
+    connection_metadata: Optional[Dict[str, Any]] = None
     status: Optional[ConnectionStatus] = None
 
 

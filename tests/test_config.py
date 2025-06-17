@@ -8,9 +8,22 @@ from src.config.settings import Settings
 
 def test_settings_default_values():
     """Test settings with default values."""
-    # This will fail without required environment variables
-    with pytest.raises(ValidationError):
-        Settings()
+    # Clear required environment variables
+    import os
+    old_db = os.environ.pop('DATABASE_URL', None)
+    old_redis = os.environ.pop('REDIS_URL', None)
+    
+    try:
+        # This will fail without required environment variables
+        # Disable .env file loading for this test
+        with pytest.raises(ValidationError):
+            Settings(_env_file=None)
+    finally:
+        # Restore environment variables
+        if old_db:
+            os.environ['DATABASE_URL'] = old_db
+        if old_redis:
+            os.environ['REDIS_URL'] = old_redis
 
 
 def test_settings_with_required_values():

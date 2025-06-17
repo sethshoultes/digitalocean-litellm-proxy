@@ -126,6 +126,10 @@ async def get_db_session() -> AsyncIterator[AsyncSession]:
         yield session
 
 
+# Alias for FastAPI dependency injection compatibility
+get_db = get_db_session
+
+
 # Health check functions
 async def check_database_health() -> dict:
     """Check database connection health."""
@@ -133,7 +137,8 @@ async def check_database_health() -> dict:
         db_manager = get_database_manager()
         async with db_manager.get_session() as session:
             # Simple query to check connection
-            result = await session.execute("SELECT 1 as health_check")
+            from sqlalchemy import text
+            result = await session.execute(text("SELECT 1 as health_check"))
             row = result.fetchone()
             
             if row and row[0] == 1:

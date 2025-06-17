@@ -4,7 +4,7 @@ import secrets
 from functools import lru_cache
 from typing import List, Optional
 
-from pydantic import Field, PostgresDsn, RedisDsn, validator
+from pydantic import Field, PostgresDsn, RedisDsn, field_validator, ConfigDict
 from pydantic_settings import BaseSettings
 
 
@@ -35,7 +35,7 @@ class Settings(BaseSettings):
     cors_headers: List[str] = Field(default=["*"], env="CORS_HEADERS")
     
     # Database settings
-    database_url: PostgresDsn = Field(env="DATABASE_URL")
+    database_url: PostgresDsn = Field(..., env="DATABASE_URL")
     database_pool_size: int = Field(default=20, env="DATABASE_POOL_SIZE")
     database_max_overflow: int = Field(default=30, env="DATABASE_MAX_OVERFLOW")
     database_pool_timeout: int = Field(default=30, env="DATABASE_POOL_TIMEOUT")
@@ -43,7 +43,7 @@ class Settings(BaseSettings):
     database_echo: bool = Field(default=False, env="DATABASE_ECHO")
     
     # Redis settings
-    redis_url: RedisDsn = Field(env="REDIS_URL")
+    redis_url: RedisDsn = Field(..., env="REDIS_URL")
     redis_max_connections: int = Field(default=20, env="REDIS_MAX_CONNECTIONS")
     redis_socket_timeout: int = Field(default=5, env="REDIS_SOCKET_TIMEOUT")
     redis_socket_connect_timeout: int = Field(default=5, env="REDIS_SOCKET_CONNECT_TIMEOUT")
@@ -82,28 +82,28 @@ class Settings(BaseSettings):
     cleanup_old_activities_days: int = Field(default=90, env="CLEANUP_OLD_ACTIVITIES_DAYS")
     summary_generation_enabled: bool = Field(default=True, env="SUMMARY_GENERATION_ENABLED")
     
-    @validator("cors_origins", pre=True)
+    @field_validator("cors_origins", mode="before")
     def parse_cors_origins(cls, value):
         """Parse CORS origins from string or list."""
         if isinstance(value, str):
             return [origin.strip() for origin in value.split(",")]
         return value
     
-    @validator("cors_methods", pre=True)
+    @field_validator("cors_methods", mode="before")
     def parse_cors_methods(cls, value):
         """Parse CORS methods from string or list."""
         if isinstance(value, str):
             return [method.strip() for method in value.split(",")]
         return value
     
-    @validator("cors_headers", pre=True)
+    @field_validator("cors_headers", mode="before")
     def parse_cors_headers(cls, value):
         """Parse CORS headers from string or list."""
         if isinstance(value, str):
             return [header.strip() for header in value.split(",")]
         return value
     
-    @validator("log_level")
+    @field_validator("log_level")
     def validate_log_level(cls, value):
         """Validate log level."""
         valid_levels = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
@@ -111,7 +111,7 @@ class Settings(BaseSettings):
             raise ValueError(f"Log level must be one of: {valid_levels}")
         return value.upper()
     
-    @validator("log_format")
+    @field_validator("log_format")
     def validate_log_format(cls, value):
         """Validate log format."""
         valid_formats = ["json", "text"]
@@ -134,11 +134,11 @@ class Settings(BaseSettings):
         """Check if running in testing mode."""
         return self.environment.lower() in ["testing", "test"]
     
-    class Config:
-        """Pydantic configuration."""
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-        case_sensitive = False
+    model_config = ConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=False
+    )
 
 
 @lru_cache()

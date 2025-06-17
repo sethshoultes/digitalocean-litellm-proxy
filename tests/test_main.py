@@ -29,8 +29,10 @@ def mock_database():
     """Mock database initialization."""
     with patch("src.main.initialize_database", new_callable=AsyncMock), \
          patch("src.main.shutdown_database", new_callable=AsyncMock), \
-         patch("src.config.database.check_database_health", new_callable=AsyncMock) as mock_health:
+         patch("src.config.database.check_database_health", new_callable=AsyncMock) as mock_health, \
+         patch("src.api.endpoints.health.check_database_health", new_callable=AsyncMock) as mock_api_health:
         mock_health.return_value = {"status": "healthy", "message": "Test database OK"}
+        mock_api_health.return_value = {"status": "healthy", "message": "Test database OK"}
         yield
 
 
@@ -39,8 +41,10 @@ def mock_redis():
     """Mock Redis initialization."""
     with patch("src.main.initialize_redis", new_callable=AsyncMock), \
          patch("src.main.shutdown_redis", new_callable=AsyncMock), \
-         patch("src.config.redis.check_redis_health", new_callable=AsyncMock) as mock_health:
+         patch("src.config.redis.check_redis_health", new_callable=AsyncMock) as mock_health, \
+         patch("src.api.endpoints.health.check_redis_health", new_callable=AsyncMock) as mock_api_health:
         mock_health.return_value = {"status": "healthy", "message": "Test Redis OK"}
+        mock_api_health.return_value = {"status": "healthy", "message": "Test Redis OK"}
         yield
 
 

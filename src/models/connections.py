@@ -47,7 +47,7 @@ class UserConnection(Base, TimestampMixin):
     error_count: Mapped[int] = mapped_column(Integer, default=0)
     success_count: Mapped[int] = mapped_column(Integer, default=0)
     avg_response_time: Mapped[Optional[Decimal]] = mapped_column(Numeric(10, 3))
-    metadata: Mapped[Dict[str, Any]] = mapped_column(JSONB, default=dict)
+    connection_metadata: Mapped[Dict[str, Any]] = mapped_column(JSONB, default=dict)
     created_by: Mapped[Optional[str]] = mapped_column(String)
     updated_by: Mapped[Optional[str]] = mapped_column(String)
     
