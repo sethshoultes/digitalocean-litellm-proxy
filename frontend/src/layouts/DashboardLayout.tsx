@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Link, Outlet, useLocation } from 'react-router-dom'
 import {
   Bars3Icon,
   XMarkIcon,
@@ -7,34 +7,81 @@ import {
   LinkIcon,
   ShieldCheckIcon,
   CogIcon,
-  UserIcon,
-  ArrowRightOnRectangleIcon,
+  UserGroupIcon,
+  ChartBarSquareIcon,
+  BellIcon,
+  MagnifyingGlassIcon,
 } from '@heroicons/react/24/outline'
 import { clsx } from 'clsx'
 
 import { useAuth } from '@/contexts/AuthContext'
+import { ResponsiveTest, ResponsiveVisibilityTest } from '@/components/common/ResponsiveTest'
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Connections', href: '/connections', icon: LinkIcon },
-  { name: 'Policies', href: '/policies', icon: ShieldCheckIcon },
-  { name: 'Settings', href: '/settings', icon: CogIcon },
+  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, adminOnly: false },
+  { name: 'Connections', href: '/connections', icon: LinkIcon, adminOnly: false },
+  { name: 'Policies', href: '/policies', icon: ShieldCheckIcon, adminOnly: false },
+  { name: 'Users', href: '/users', icon: UserGroupIcon, adminOnly: true },
+  { name: 'Monitoring', href: '/monitoring', icon: ChartBarSquareIcon, adminOnly: true },
+  { name: 'Settings', href: '/settings', icon: CogIcon, adminOnly: true },
 ]
+
+// Breadcrumb mapping
+const breadcrumbMap: Record<string, string[]> = {
+  '/dashboard': ['Dashboard'],
+  '/connections': ['Dashboard', 'Connections'],
+  '/connections/new': ['Dashboard', 'Connections', 'New Connection'],
+  '/policies': ['Dashboard', 'Policies'],
+  '/policies/new': ['Dashboard', 'Policies', 'New Policy'],
+  '/users': ['Dashboard', 'Users'],
+  '/monitoring': ['Dashboard', 'Monitoring'],
+  '/settings': ['Dashboard', 'Settings'],
+}
 
 export function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const { user, logout } = useAuth()
+  const [searchQuery, setSearchQuery] = useState('')
+  const [showSearch, setShowSearch] = useState(false)
+  const [notifications, setNotifications] = useState(3) // Mock notification count
+  const { user } = useAuth()
   const location = useLocation()
-  const navigate = useNavigate()
 
-  const handleLogout = async () => {
-    try {
-      await logout()
-      navigate('/login')
-    } catch (error) {
-      console.error('Logout error:', error)
+  // Get filtered navigation based on user role
+  const filteredNavigation = navigation.filter(item => 
+    !item.adminOnly || user?.role === 'admin'
+  )
+
+  // Get current breadcrumbs
+  const breadcrumbs = breadcrumbMap[location.pathname] || ['Dashboard']
+
+  // Handle search
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (searchQuery.trim()) {
+      // Navigate to search results or filter current view
+      console.log('Searching for:', searchQuery)
+      setShowSearch(false)
+      setSearchQuery('')
     }
   }
+
+  // Handle keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.metaKey && e.key === 'k') {
+        e.preventDefault()
+        setShowSearch(true)
+      }
+      if (e.key === 'Escape') {
+        setShowSearch(false)
+        setSearchQuery('')
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
 
   return (
     <div className="h-screen flex">
@@ -68,7 +115,7 @@ export function DashboardLayout() {
               </span>
             </div>
             <nav className="mt-5 px-2 space-y-1">
-              {navigation.map((item) => {
+              {filteredNavigation.map((item) => {
                 const isCurrent = location.pathname.startsWith(item.href)
                 return (
                   <Link
@@ -94,6 +141,11 @@ export function DashboardLayout() {
               })}
             </nav>
           </div>
+          
+          {/* Mobile User Section */}
+          <div className="flex-shrink-0 border-t border-gray-200 p-4">
+            <UserProfile />
+          </div>
         </div>
       </div>
 
@@ -113,7 +165,7 @@ export function DashboardLayout() {
                 </span>
               </div>
               <nav className="mt-5 flex-1 px-2 space-y-1">
-                {navigation.map((item) => {
+                {filteredNavigation.map((item) => {
                   const isCurrent = location.pathname.startsWith(item.href)
                   return (
                     <Link
@@ -140,27 +192,8 @@ export function DashboardLayout() {
             </div>
             
             {/* User section */}
-            <div className="flex-shrink-0 flex border-t border-gray-200 p-4">
-              <div className="flex-shrink-0 w-full group block">
-                <div className="flex items-center">
-                  <div>
-                    <div className="inline-flex items-center justify-center h-9 w-9 rounded-full bg-gray-500">
-                      <UserIcon className="h-5 w-5 text-white" />
-                    </div>
-                  </div>
-                  <div className="ml-3 flex-1">
-                    <p className="text-sm font-medium text-gray-700">{user?.email}</p>
-                    <p className="text-xs font-medium text-gray-500 capitalize">{user?.role}</p>
-                  </div>
-                  <button
-                    onClick={handleLogout}
-                    className="ml-3 flex-shrink-0 p-1 text-gray-400 hover:text-gray-500"
-                    title="Sign out"
-                  >
-                    <ArrowRightOnRectangleIcon className="h-5 w-5" />
-                  </button>
-                </div>
-              </div>
+            <div className="flex-shrink-0 border-t border-gray-200 p-4">
+              <UserProfile />
             </div>
           </div>
         </div>
@@ -179,11 +212,120 @@ export function DashboardLayout() {
           </button>
         </div>
 
+        {/* Header */}
+        <div className="bg-white shadow-sm border-b border-gray-200">
+          <div className="px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between h-16">
+              {/* Breadcrumbs */}
+              <div className="flex items-center">
+                <nav className="flex" aria-label="Breadcrumb">
+                  <ol className="flex items-center space-x-4">
+                    {breadcrumbs.map((crumb, index) => (
+                      <li key={crumb}>
+                        <div className="flex items-center">
+                          {index > 0 && (
+                            <ChevronRightIcon className="flex-shrink-0 h-5 w-5 text-gray-400" />
+                          )}
+                          <span
+                            className={clsx(
+                              index === breadcrumbs.length - 1
+                                ? 'text-gray-900 font-medium'
+                                : 'text-gray-500 hover:text-gray-700',
+                              index > 0 ? 'ml-4' : '',
+                              'text-sm'
+                            )}
+                          >
+                            {crumb}
+                          </span>
+                        </div>
+                      </li>
+                    ))}
+                  </ol>
+                </nav>
+              </div>
+
+              {/* Right side - Search and Notifications */}
+              <div className="flex items-center space-x-4">
+                {/* Quick Search */}
+                <div className="relative">
+                  {showSearch ? (
+                    <form onSubmit={handleSearch} className="flex items-center">
+                      <div className="relative">
+                        <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <input
+                          type="text"
+                          placeholder="Search..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500 text-sm w-64"
+                          autoFocus
+                          onBlur={() => {
+                            if (!searchQuery) setShowSearch(false)
+                          }}
+                        />
+                      </div>
+                    </form>
+                  ) : (
+                    <button
+                      onClick={() => setShowSearch(true)}
+                      className="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-md transition-colors"
+                      title="Search (⌘K)"
+                    >
+                      <MagnifyingGlassIcon className="h-5 w-5" />
+                    </button>
+                  )}
+                </div>
+
+                {/* Notifications */}
+                <div className="relative">
+                  <button
+                    className="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-md transition-colors relative"
+                    title="Notifications"
+                  >
+                    <BellIcon className="h-5 w-5" />
+                    {notifications > 0 && (
+                      <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                        {notifications > 9 ? '9+' : notifications}
+                      </span>
+                    )}
+                  </button>
+                </div>
+
+                {/* User menu */}
+                <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-2">
+                    <div className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-gray-500">
+                      <UserIcon className="h-4 w-4 text-white" />
+                    </div>
+                    <div className="hidden md:block">
+                      <p className="text-sm font-medium text-gray-700 truncate max-w-32">
+                        {user?.email}
+                      </p>
+                      <p className="text-xs text-gray-500 capitalize">{user?.role}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-md transition-colors"
+                    title="Sign out"
+                  >
+                    <ArrowRightOnRectangleIcon className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Page content */}
-        <main className="flex-1 relative z-0 overflow-y-auto focus:outline-none">
+        <main className="flex-1 relative z-0 overflow-y-auto focus:outline-none bg-gray-50">
           <Outlet />
         </main>
       </div>
+
+      {/* Development-only responsive testing */}
+      <ResponsiveTest />
+      <ResponsiveVisibilityTest />
     </div>
   )
 }

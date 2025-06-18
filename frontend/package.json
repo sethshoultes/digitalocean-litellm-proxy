@@ -17,7 +17,7 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
-    "prepare": "husky install",
+    "prepare": "cd .. && husky install frontend/.husky",
     "docker:build": "docker build -t litellm-frontend .",
     "docker:run": "docker run -p 3000:80 litellm-frontend"
   },

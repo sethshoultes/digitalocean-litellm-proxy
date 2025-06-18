@@ -82,13 +82,19 @@ function App() {
                     <Route index element={<Navigate to="/dashboard" replace />} />
                     <Route path="dashboard" element={<DashboardPage />} />
                     
-                    {/* Placeholder routes for future implementation */}
+                    {/* User-accessible routes */}
                     <Route 
                       path="connections" 
                       element={
                         <div className="p-6">
                           <h1 className="text-2xl font-semibold text-gray-900">Connections</h1>
                           <p className="mt-2 text-gray-600">Connection management interface coming soon...</p>
+                          <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <p className="text-sm text-blue-700">
+                              This interface will allow you to manage your LLM provider connections, 
+                              including API keys, endpoint configurations, and connection health monitoring.
+                            </p>
+                          </div>
                         </div>
                       } 
                     />
@@ -98,16 +104,66 @@ function App() {
                         <div className="p-6">
                           <h1 className="text-2xl font-semibold text-gray-900">Policies</h1>
                           <p className="mt-2 text-gray-600">Policy management interface coming soon...</p>
+                          <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-4">
+                            <p className="text-sm text-green-700">
+                              Create and manage access policies to control user permissions, 
+                              rate limits, and usage quotas across your LLM connections.
+                            </p>
+                          </div>
                         </div>
+                      } 
+                    />
+                    
+                    {/* Admin-only routes */}
+                    <Route 
+                      path="users" 
+                      element={
+                        <ProtectedRoute requiredRole="admin">
+                          <div className="p-6">
+                            <h1 className="text-2xl font-semibold text-gray-900">User Management</h1>
+                            <p className="mt-2 text-gray-600">User administration interface coming soon...</p>
+                            <div className="mt-4 bg-purple-50 border border-purple-200 rounded-lg p-4">
+                              <p className="text-sm text-purple-700">
+                                Manage user accounts, roles, and permissions. Create new users and 
+                                assign them to appropriate access policies.
+                              </p>
+                            </div>
+                          </div>
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="monitoring" 
+                      element={
+                        <ProtectedRoute requiredRole="admin">
+                          <div className="p-6">
+                            <h1 className="text-2xl font-semibold text-gray-900">System Monitoring</h1>
+                            <p className="mt-2 text-gray-600">Monitoring dashboard coming soon...</p>
+                            <div className="mt-4 bg-orange-50 border border-orange-200 rounded-lg p-4">
+                              <p className="text-sm text-orange-700">
+                                Real-time monitoring of LLM usage, performance metrics, 
+                                error rates, and system health across all connections.
+                              </p>
+                            </div>
+                          </div>
+                        </ProtectedRoute>
                       } 
                     />
                     <Route 
                       path="settings" 
                       element={
-                        <div className="p-6">
-                          <h1 className="text-2xl font-semibold text-gray-900">Settings</h1>
-                          <p className="mt-2 text-gray-600">Settings interface coming soon...</p>
-                        </div>
+                        <ProtectedRoute requiredRole="admin">
+                          <div className="p-6">
+                            <h1 className="text-2xl font-semibold text-gray-900">System Settings</h1>
+                            <p className="mt-2 text-gray-600">Settings interface coming soon...</p>
+                            <div className="mt-4 bg-gray-50 border border-gray-200 rounded-lg p-4">
+                              <p className="text-sm text-gray-700">
+                                Configure system-wide settings, authentication providers, 
+                                security policies, and integration configurations.
+                              </p>
+                            </div>
+                          </div>
+                        </ProtectedRoute>
                       } 
                     />
                   </Route>
