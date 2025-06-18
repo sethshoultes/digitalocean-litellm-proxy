@@ -19,7 +19,7 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import ARRAY, INET, JSONB, UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from .base import Base, ConnectionStatus, ProviderType, TimestampMixin
+from .base import Base, ConnectionStatus, ProviderType, TimestampMixin, ConnectionStatusType, ProviderTypeEnum
 
 
 class UserConnection(Base, TimestampMixin):
@@ -34,9 +34,10 @@ class UserConnection(Base, TimestampMixin):
     )
     user_id: Mapped[str] = mapped_column(String, nullable=False, index=True)
     connection_name: Mapped[str] = mapped_column(String, nullable=False)
-    provider: Mapped[ProviderType] = mapped_column(nullable=False, index=True)
-    status: Mapped[ConnectionStatus] = mapped_column(
-        default=ConnectionStatus.ACTIVE, 
+    provider: Mapped[str] = mapped_column(ProviderTypeEnum, nullable=False, index=True)
+    status: Mapped[str] = mapped_column(
+        ConnectionStatusType,
+        default="active", 
         index=True
     )
     configuration: Mapped[Dict[str, Any]] = mapped_column(JSONB, nullable=False)
@@ -47,7 +48,7 @@ class UserConnection(Base, TimestampMixin):
     error_count: Mapped[int] = mapped_column(Integer, default=0)
     success_count: Mapped[int] = mapped_column(Integer, default=0)
     avg_response_time: Mapped[Optional[Decimal]] = mapped_column(Numeric(10, 3))
-    connection_metadata: Mapped[Dict[str, Any]] = mapped_column(JSONB, default=dict)
+    connection_metadata: Mapped[Dict[str, Any]] = mapped_column("metadata", JSONB, default=dict)
     created_by: Mapped[Optional[str]] = mapped_column(String)
     updated_by: Mapped[Optional[str]] = mapped_column(String)
     
@@ -82,7 +83,7 @@ class ConnectionTemplate(Base, TimestampMixin):
         server_default=func.uuid_generate_v4()
     )
     template_name: Mapped[str] = mapped_column(String, nullable=False, unique=True)
-    provider: Mapped[ProviderType] = mapped_column(nullable=False, index=True)
+    provider: Mapped[str] = mapped_column(ProviderTypeEnum, nullable=False, index=True)
     configuration_template: Mapped[Dict[str, Any]] = mapped_column(JSONB, nullable=False)
     required_fields: Mapped[List[str]] = mapped_column(ARRAY(String), nullable=False)
     optional_fields: Mapped[List[str]] = mapped_column(ARRAY(String), default=list)

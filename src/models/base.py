@@ -6,7 +6,7 @@ from typing import Any, Optional
 from uuid import UUID, uuid4
 
 from sqlalchemy import DateTime, func
-from sqlalchemy.dialects.postgresql import UUID as PGUUID
+from sqlalchemy.dialects.postgresql import ENUM, UUID as PGUUID
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
@@ -54,6 +54,29 @@ class ProviderType(str, enum.Enum):
     COHERE = "cohere"
     REPLICATE = "replicate"
     CUSTOM = "custom"
+
+
+# PostgreSQL ENUM types that match the database schema
+ConnectionStatusType = ENUM(
+    "active", "inactive", "error", "testing",
+    name="connection_status"
+)
+
+ProviderTypeEnum = ENUM(
+    "openai", "anthropic", "azure", "aws", "google", 
+    "huggingface", "cohere", "replicate", "custom",
+    name="provider_type"
+)
+
+ActivityTypeEnum = ENUM(
+    "created", "updated", "deleted", "tested", "used", "failed",
+    name="activity_type"
+)
+
+UserRoleEnum = ENUM(
+    "PROXY_ADMIN", "ORG_ADMIN", "INTERNAL_USER", "CUSTOMER", "TEAM_ADMIN",
+    name="user_role"
+)
 
 
 class TimestampMixin:

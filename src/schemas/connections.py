@@ -20,7 +20,6 @@ class ConnectionBase(BaseModel):
 
 class ConnectionCreate(ConnectionBase):
     """Connection creation schema."""
-    user_id: str = Field(..., min_length=1)
     credentials: Optional[Dict[str, str]] = None
 
 
