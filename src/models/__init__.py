@@ -1,17 +1,17 @@
 """Database models for LiteLLM Connection Management."""
 
+from .activity import ActivitySummary, ConnectionActivity
 from .base import Base, ConnectionStatus, ProviderType, TimestampMixin
-from .connections import UserConnection, ConnectionTemplate, SharedConnection
+from .connections import ConnectionTemplate, SharedConnection, UserConnection
 from .policies import AccessPolicy, UserAccessPolicy
-from .activity import ConnectionActivity, ActivitySummary
 
 __all__ = [
     "Base",
     "ConnectionStatus",
-    "ProviderType", 
+    "ProviderType",
     "TimestampMixin",
     "UserConnection",
-    "ConnectionTemplate", 
+    "ConnectionTemplate",
     "SharedConnection",
     "AccessPolicy",
     "UserAccessPolicy",

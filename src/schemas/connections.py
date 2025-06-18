@@ -12,6 +12,7 @@ from src.models.base import ConnectionStatus, ProviderType
 
 class ConnectionBase(BaseModel):
     """Base connection schema."""
+
     connection_name: str = Field(..., min_length=3, max_length=255)
     provider: ProviderType
     configuration: Dict[str, Any]
@@ -20,11 +21,13 @@ class ConnectionBase(BaseModel):
 
 class ConnectionCreate(ConnectionBase):
     """Connection creation schema."""
+
     credentials: Optional[Dict[str, str]] = None
 
 
 class ConnectionUpdate(BaseModel):
     """Connection update schema."""
+
     connection_name: Optional[str] = Field(None, min_length=3, max_length=255)
     configuration: Optional[Dict[str, Any]] = None
     connection_metadata: Optional[Dict[str, Any]] = None
@@ -33,6 +36,7 @@ class ConnectionUpdate(BaseModel):
 
 class ConnectionResponse(ConnectionBase):
     """Connection response schema."""
+
     connection_id: UUID
     user_id: str
     status: ConnectionStatus
@@ -53,6 +57,7 @@ class ConnectionResponse(ConnectionBase):
 
 class ConnectionSummary(BaseModel):
     """Connection summary schema."""
+
     connection_id: UUID
     connection_name: str
     provider: ProviderType

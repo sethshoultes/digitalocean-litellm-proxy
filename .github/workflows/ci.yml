@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [ main, clean-main ]
 
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -37,7 +42,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: [3.9, 3.10, 3.11]
+        python-version: ["3.9", "3.10", "3.11"]
 
     steps:
     - uses: actions/checkout@v4
@@ -135,7 +140,7 @@ jobs:
         output: 'trivy-results.sarif'
     
     - name: Upload Trivy scan results to GitHub Security tab
-      uses: github/codeql-action/upload-sarif@v2
+      uses: github/codeql-action/upload-sarif@v3
       if: always()
       with:
         sarif_file: 'trivy-results.sarif'

@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 
 class PolicyBase(BaseModel):
     """Base policy schema."""
+
     policy_name: str = Field(..., min_length=3, max_length=255)
     description: Optional[str] = None
     resource_type: str = Field(default="connection")
@@ -19,11 +20,13 @@ class PolicyBase(BaseModel):
 
 class PolicyCreate(PolicyBase):
     """Policy creation schema."""
+
     policy_metadata: Optional[Dict[str, Any]] = Field(default_factory=dict)
 
 
 class PolicyUpdate(BaseModel):
     """Policy update schema."""
+
     policy_name: Optional[str] = Field(None, min_length=3, max_length=255)
     description: Optional[str] = None
     resource_type: Optional[str] = None
@@ -36,6 +39,7 @@ class PolicyUpdate(BaseModel):
 
 class PolicyResponse(PolicyBase):
     """Policy response schema."""
+
     policy_id: UUID
     policy_metadata: Dict[str, Any]
     is_system_policy: bool
@@ -50,6 +54,7 @@ class PolicyResponse(PolicyBase):
 
 class UserPolicyAssignment(BaseModel):
     """User policy assignment schema."""
+
     user_id: str = Field(..., min_length=1)
     expires_at: Optional[datetime] = None
     conditions: Optional[Dict[str, Any]] = Field(default_factory=dict)
@@ -58,6 +63,7 @@ class UserPolicyAssignment(BaseModel):
 
 class UserPolicyResponse(BaseModel):
     """User policy assignment response schema."""
+
     user_id: str
     policy_id: UUID
     policy: PolicyResponse

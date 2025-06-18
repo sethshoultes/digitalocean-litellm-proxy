@@ -14,19 +14,20 @@ router = APIRouter()
 async def health_check():
     """Comprehensive health check."""
     settings = get_settings()
-    
+
     # Check all components
     db_health = await check_database_health()
     redis_health = await check_redis_health()
-    
+
     # Determine overall health
     is_healthy = (
-        db_health["status"] == "healthy" and 
-        redis_health["status"] == "healthy"
+        db_health["status"] == "healthy" and redis_health["status"] == "healthy"
     )
-    
-    status_code = status.HTTP_200_OK if is_healthy else status.HTTP_503_SERVICE_UNAVAILABLE
-    
+
+    status_code = (
+        status.HTTP_200_OK if is_healthy else status.HTTP_503_SERVICE_UNAVAILABLE
+    )
+
     return JSONResponse(
         status_code=status_code,
         content={
@@ -36,8 +37,8 @@ async def health_check():
             "components": {
                 "database": db_health,
                 "redis": redis_health,
-            }
-        }
+            },
+        },
     )
 
 
@@ -45,21 +46,23 @@ async def health_check():
 async def database_health():
     """Database health check."""
     health = await check_database_health()
-    status_code = status.HTTP_200_OK if health["status"] == "healthy" else status.HTTP_503_SERVICE_UNAVAILABLE
-    
-    return JSONResponse(
-        status_code=status_code,
-        content=health
+    status_code = (
+        status.HTTP_200_OK
+        if health["status"] == "healthy"
+        else status.HTTP_503_SERVICE_UNAVAILABLE
     )
+
+    return JSONResponse(status_code=status_code, content=health)
 
 
 @router.get("/redis")
 async def redis_health():
     """Redis health check."""
     health = await check_redis_health()
-    status_code = status.HTTP_200_OK if health["status"] == "healthy" else status.HTTP_503_SERVICE_UNAVAILABLE
-    
-    return JSONResponse(
-        status_code=status_code,
-        content=health
+    status_code = (
+        status.HTTP_200_OK
+        if health["status"] == "healthy"
+        else status.HTTP_503_SERVICE_UNAVAILABLE
     )
+
+    return JSONResponse(status_code=status_code, content=health)

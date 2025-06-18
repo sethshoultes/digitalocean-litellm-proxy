@@ -1,8 +1,9 @@
 """Test main application."""
 
+from unittest.mock import AsyncMock, patch
+
 import pytest
 from fastapi.testclient import TestClient
-from unittest.mock import AsyncMock, patch
 
 from src.main import create_app
 
@@ -27,22 +28,31 @@ def mock_settings():
 @pytest.fixture
 def mock_database():
     """Mock database initialization."""
-    with patch("src.main.initialize_database", new_callable=AsyncMock), \
-         patch("src.main.shutdown_database", new_callable=AsyncMock), \
-         patch("src.config.database.check_database_health", new_callable=AsyncMock) as mock_health, \
-         patch("src.api.endpoints.health.check_database_health", new_callable=AsyncMock) as mock_api_health:
+    with patch("src.main.initialize_database", new_callable=AsyncMock), patch(
+        "src.main.shutdown_database", new_callable=AsyncMock
+    ), patch(
+        "src.config.database.check_database_health", new_callable=AsyncMock
+    ) as mock_health, patch(
+        "src.api.endpoints.health.check_database_health", new_callable=AsyncMock
+    ) as mock_api_health:
         mock_health.return_value = {"status": "healthy", "message": "Test database OK"}
-        mock_api_health.return_value = {"status": "healthy", "message": "Test database OK"}
+        mock_api_health.return_value = {
+            "status": "healthy",
+            "message": "Test database OK",
+        }
         yield
 
 
 @pytest.fixture
 def mock_redis():
     """Mock Redis initialization."""
-    with patch("src.main.initialize_redis", new_callable=AsyncMock), \
-         patch("src.main.shutdown_redis", new_callable=AsyncMock), \
-         patch("src.config.redis.check_redis_health", new_callable=AsyncMock) as mock_health, \
-         patch("src.api.endpoints.health.check_redis_health", new_callable=AsyncMock) as mock_api_health:
+    with patch("src.main.initialize_redis", new_callable=AsyncMock), patch(
+        "src.main.shutdown_redis", new_callable=AsyncMock
+    ), patch(
+        "src.config.redis.check_redis_health", new_callable=AsyncMock
+    ) as mock_health, patch(
+        "src.api.endpoints.health.check_redis_health", new_callable=AsyncMock
+    ) as mock_api_health:
         mock_health.return_value = {"status": "healthy", "message": "Test Redis OK"}
         mock_api_health.return_value = {"status": "healthy", "message": "Test Redis OK"}
         yield
@@ -59,7 +69,7 @@ def test_health_endpoint(client):
     """Test health endpoint."""
     response = client.get("/health")
     assert response.status_code == 200
-    
+
     data = response.json()
     assert data["status"] == "healthy"
     assert "version" in data
