@@ -49,13 +49,29 @@ Currently, LiteLLM administrators must manage users through disparate CLI comman
 
 ## 🚀 Live Deployment
 
-**The LiteLLM Admin Interface is now publicly accessible:**
+**Production Instance:** https://64.23.251.16.nip.io
 
-- **Frontend Dashboard**: https://64.23.251.16.nip.io/admin/
-- **Backend API**: https://64.23.251.16.nip.io/admin-api/
-- **API Documentation**: https://64.23.251.16.nip.io/admin-api/docs
+### Current Status ✅ FULLY OPERATIONAL
 
-**Status**: ✅ Production Ready | 🔐 HTTPS Encrypted | 🛡️ Enterprise Secure
+- **🔐 Frontend Interface**: https://64.23.251.16.nip.io/admin/ (React + TypeScript)
+- **🔗 Backend API**: https://64.23.251.16.nip.io/admin-api/ (FastAPI + PostgreSQL)  
+- **⚡ LiteLLM Proxy**: https://64.23.251.16.nip.io (OpenAI + Anthropic APIs working)
+- **🔒 Security**: Let's Encrypt SSL certificates, HTTPS-only access
+- **📊 Health Status**: 5/6 provider endpoints operational, full functionality available
+
+### Quick Test
+
+```bash
+# Test proxy authentication
+curl -H "Authorization: Bearer YOUR_LITELLM_PROXY_KEY" \
+     "https://64.23.251.16.nip.io/v1/models"
+
+# Test chat completion
+curl -X POST "https://64.23.251.16.nip.io/v1/chat/completions" \
+     -H "Authorization: Bearer YOUR_LITELLM_PROXY_KEY" \
+     -H "Content-Type: application/json" \
+     -d '{"model": "gpt-3.5-turbo", "messages": [{"role": "user", "content": "Hello!"}]}'
+```
 
 ---
 

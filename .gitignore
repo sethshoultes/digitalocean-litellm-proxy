@@ -84,5 +84,5 @@ snap/
 !docker-compose.yml
 !Dockerfile
 !litellm-config.yaml
-!litellm-config-direct.yaml
+# litellm-config-direct.yaml contains actual API keys - do not commit
 !*.md
