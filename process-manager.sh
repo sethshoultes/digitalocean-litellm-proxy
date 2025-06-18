@@ -22,6 +22,10 @@ start_backend() {
     kill_port $BACKEND_PORT
     sleep 2
     cd /root
+    
+    # Load environment variables
+    source /root/.env
+    
     uvicorn src.main:app --host 0.0.0.0 --port $BACKEND_PORT > backend.log 2>&1 &
     echo "Backend started with PID $!"
 }
@@ -40,11 +44,21 @@ start_frontend() {
 start_litellm() {
     echo "Starting LiteLLM proxy on port $LITELLM_PORT..."
     kill_port $LITELLM_PORT
-    pkill -f litellm || true
+    docker stop litellm-working 2>/dev/null || true
+    docker rm litellm-working 2>/dev/null || true
     sleep 2
     cd /root
-    litellm --config litellm-minimal.yaml --port $LITELLM_PORT --host 0.0.0.0 > litellm.log 2>&1 &
-    echo "LiteLLM started with PID $!"
+    
+    # Load environment variables
+    source /root/.env
+    
+    # Start LiteLLM in Docker with working configuration
+    docker run -d --name litellm-working -p $LITELLM_PORT:$LITELLM_PORT \
+        -v $(pwd)/litellm-working.yaml:/app/config.yaml \
+        ghcr.io/berriai/litellm:main-latest \
+        --config /app/config.yaml --port $LITELLM_PORT --host 0.0.0.0 > litellm.log 2>&1
+    
+    echo "LiteLLM started in Docker container"
 }
 
 # Function to stop all services

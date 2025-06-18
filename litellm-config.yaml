@@ -15,6 +15,10 @@ model_list:
     litellm_params:
       model: anthropic/claude-3-sonnet-20240229
       api_key: ${ANTHROPIC_API_KEY}
+  - model_name: claude-3-opus-20240229
+    litellm_params:
+      model: anthropic/claude-3-opus-20240229
+      api_key: ${ANTHROPIC_API_KEY}
   - model_name: claude-3-5-sonnet-20241022
     litellm_params:
       model: anthropic/claude-3-5-sonnet-20241022

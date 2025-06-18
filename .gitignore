@@ -41,9 +41,16 @@ logs/
 
 # Environment variables
 .env
+.env.*
 .env.local
 .env.production
 deploy/.env
+
+# LiteLLM test configurations (contain API keys)
+litellm-basic.yaml
+litellm-minimal.yaml
+litellm-simple.yaml
+simple-proxy.py
 
 # Database
 *.db
