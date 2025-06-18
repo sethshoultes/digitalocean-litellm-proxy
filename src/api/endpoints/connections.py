@@ -1,7 +1,6 @@
 """Connection management endpoints."""
 
 from typing import List, Optional
-from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import and_, func, or_, select
@@ -19,7 +18,7 @@ router = APIRouter()
 
 
 async def check_connection_access(
-    connection_id: UUID,
+    connection_id: str,
     current_user: User,
     db: AsyncSession,
     require_write: bool = False,
@@ -63,7 +62,7 @@ async def list_connections(
     ),
     user_id: Optional[str] = Query(None, description="Filter by user ID"),
     provider: Optional[ProviderType] = Query(None, description="Filter by provider"),
-    status: Optional[ConnectionStatus] = Query(
+    connection_status: Optional[ConnectionStatus] = Query(
         None, description="Filter by connection status"
     ),
     search: Optional[str] = Query(None, description="Search in connection names"),
@@ -88,8 +87,8 @@ async def list_connections(
 
         if provider:
             filters.append(UserConnection.provider == provider)
-        if status:
-            filters.append(UserConnection.status == status)
+        if connection_status:
+            filters.append(UserConnection.status == connection_status)
         if search:
             filters.append(UserConnection.connection_name.ilike(f"%{search}%"))
 
@@ -166,7 +165,7 @@ async def create_connection(
 
 @router.get("/{connection_id}", response_model=ConnectionResponse)
 async def get_connection(
-    connection_id: UUID,
+    connection_id: str,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db_session),
 ):
@@ -198,7 +197,7 @@ async def get_connection(
 
 @router.put("/{connection_id}", response_model=ConnectionResponse)
 async def update_connection(
-    connection_id: UUID,
+    connection_id: str,
     connection_update: ConnectionUpdate,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db_session),
@@ -235,7 +234,7 @@ async def update_connection(
 
 @router.delete("/{connection_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_connection(
-    connection_id: UUID,
+    connection_id: str,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db_session),
 ):
@@ -265,7 +264,7 @@ async def delete_connection(
 
 @router.post("/{connection_id}/test")
 async def test_connection(
-    connection_id: UUID,
+    connection_id: str,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db_session),
 ):

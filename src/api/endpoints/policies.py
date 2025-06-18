@@ -1,7 +1,6 @@
 """Access policy management endpoints."""
 
 from typing import List, Optional
-from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import and_, select
@@ -119,7 +118,7 @@ async def create_policy(
 
 @router.get("/{policy_id}", response_model=PolicyResponse)
 async def get_policy(
-    policy_id: UUID,
+    policy_id: str,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db_session),
 ):
@@ -159,7 +158,7 @@ async def get_policy(
 
 @router.put("/{policy_id}", response_model=PolicyResponse)
 async def update_policy(
-    policy_id: UUID,
+    policy_id: str,
     policy_update: PolicyUpdate,
     current_user: User = Depends(require_roles("PROXY_ADMIN", "ORG_ADMIN")),
     db: AsyncSession = Depends(get_db_session),
@@ -223,7 +222,7 @@ async def update_policy(
 
 @router.delete("/{policy_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_policy(
-    policy_id: UUID,
+    policy_id: str,
     current_user: User = Depends(require_roles("PROXY_ADMIN", "ORG_ADMIN")),
     db: AsyncSession = Depends(get_db_session),
 ):
@@ -277,7 +276,7 @@ async def delete_policy(
 
 @router.post("/{policy_id}/assign", response_model=UserPolicyResponse)
 async def assign_policy_to_user(
-    policy_id: UUID,
+    policy_id: str,
     assignment: UserPolicyAssignment,
     current_user: User = Depends(require_roles("PROXY_ADMIN", "ORG_ADMIN")),
     db: AsyncSession = Depends(get_db_session),
@@ -352,7 +351,7 @@ async def assign_policy_to_user(
 
 @router.delete("/{policy_id}/assign/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def remove_policy_from_user(
-    policy_id: UUID,
+    policy_id: str,
     user_id: str,
     current_user: User = Depends(require_roles("PROXY_ADMIN", "ORG_ADMIN")),
     db: AsyncSession = Depends(get_db_session),

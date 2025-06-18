@@ -46,6 +46,8 @@ class ActivityType(str, enum.Enum):
     TESTED = "tested"
     USED = "used"
     FAILED = "failed"
+    API_CALL = "api_call"
+    CONNECTION_TEST = "connection_test"
 
 
 class ProviderType(str, enum.Enum):
@@ -59,6 +61,15 @@ class ProviderType(str, enum.Enum):
     HUGGINGFACE = "huggingface"
     COHERE = "cohere"
     REPLICATE = "replicate"
+    CUSTOM = "custom"
+
+
+class ConnectionType(str, enum.Enum):
+    """Connection type enumeration."""
+
+    API_KEY = "api_key"
+    OAUTH = "oauth"
+    SERVICE_ACCOUNT = "service_account"
     CUSTOM = "custom"
 
 
@@ -81,7 +92,11 @@ ProviderTypeEnum = ENUM(
 )
 
 ActivityTypeEnum = ENUM(
-    "created", "updated", "deleted", "tested", "used", "failed", name="activity_type"
+    "created", "updated", "deleted", "tested", "used", "failed", "api_call", "connection_test", name="activity_type"
+)
+
+ConnectionTypeEnum = ENUM(
+    "api_key", "oauth", "service_account", "custom", name="connection_type"
 )
 
 UserRoleEnum = ENUM(

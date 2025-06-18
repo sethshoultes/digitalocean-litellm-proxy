@@ -2,8 +2,7 @@
 
 from datetime import datetime
 from decimal import Decimal
-from typing import Any, Dict, Optional
-from uuid import UUID
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
@@ -37,7 +36,7 @@ class ConnectionUpdate(BaseModel):
 class ConnectionResponse(ConnectionBase):
     """Connection response schema."""
 
-    connection_id: UUID
+    connection_id: str
     user_id: str
     status: ConnectionStatus
     last_used: Optional[datetime] = None
@@ -45,7 +44,11 @@ class ConnectionResponse(ConnectionBase):
     health_status: Optional[str] = None
     error_count: int
     success_count: int
-    avg_response_time: Optional[Decimal] = None
+    avg_response_time_ms: Optional[int] = None
+    usage_count: int = 0
+    models: List[str] = []
+    spend: float = 0.0
+    max_budget: Optional[float] = None
     created_at: datetime
     updated_at: datetime
     created_by: Optional[str] = None
@@ -58,7 +61,7 @@ class ConnectionResponse(ConnectionBase):
 class ConnectionSummary(BaseModel):
     """Connection summary schema."""
 
-    connection_id: UUID
+    connection_id: str
     connection_name: str
     provider: ProviderType
     status: ConnectionStatus

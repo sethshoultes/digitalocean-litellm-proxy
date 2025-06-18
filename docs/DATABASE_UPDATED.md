@@ -1,52 +1,100 @@
-# Updated LiteLLM User Connection Management Database Schema
+# LiteLLM User Connection Management Database Schema v2.0
 
-**Version:** 2.0 (Aligned with LiteLLM Architecture)  
-**Date:** June 17, 2025  
-**Status:** Production Ready - LiteLLM Compatible
+**Version:** 2.0 (LiteLLM Compatible Architecture)  
+**Date:** June 18, 2025  
+**Status:** Production Ready - Fully Compatible with Official LiteLLM Schema  
+**Migration Status:** Ready for existing LiteLLM deployments
 
-## Key Changes from v1.0
+## Major Compatibility Update: v1.0 → v2.0
 
-✅ **Fixed Critical Issues:**
-- Aligned data types with actual LiteLLM schema (TEXT primary keys, JSON fields)
-- Added proper foreign key constraints to existing LiteLLM tables
-- Completed activity tracking with all necessary fields (tokens, costs, models)
-- Added missing connection_type field for different authentication methods
-- Integrated with LiteLLM spend tracking and budget patterns
+### Critical Architecture Alignment
 
-✅ **Enhanced Integration:**
-- Follows LiteLLM naming conventions and field patterns
-- Compatible with existing LiteLLM_UserTable, LiteLLM_VerificationToken, LiteLLM_SpendLogs
-- Maintains backward compatibility with current LiteLLM deployments
-- Uses same permission and budget management patterns as core LiteLLM
+✅ **PRIMARY KEY COMPATIBILITY:**
+- **Before:** UUID primary keys (uuid_generate_v4())
+- **After:** TEXT primary keys with prefixes (conn_[uuid], policy_[uuid])
+- **Rationale:** Matches LiteLLM's key format pattern used in existing tables
+- **Impact:** Seamless integration with LiteLLM's virtual key system
 
-✅ **Production Ready Features:**
-- Proper constraint validation for all providers
-- Automated partition management for activity logs
-- Comprehensive indexing strategy for performance
-- Security functions for credential encryption
-- Health monitoring and connection testing capabilities
+✅ **DATA TYPE ALIGNMENT:**
+- **Before:** JSONB fields for configuration and metadata
+- **After:** JSON fields to match LiteLLM standard
+- **Rationale:** Consistency with LiteLLM_UserTable and LiteLLM_TeamTable patterns
+- **Impact:** Direct compatibility with existing LiteLLM queries and indexes
 
-## Schema Overview
+✅ **ENHANCED LITELLM INTEGRATION:**
+- **Foreign Key Relationships:** Direct links to LiteLLM_UserTable, LiteLLM_SpendLogs, LiteLLM_VerificationToken
+- **Field Mapping:** Follows exact LiteLLM patterns for spend, models, metadata
+- **Budget Management:** Integrated with LiteLLM's existing budget tracking system
+- **Activity Tracking:** Links to existing LiteLLM_SpendLogs for unified reporting
 
-### Core Tables (New)
+✅ **PRODUCTION DEPLOYMENT READY:**
+- **Zero Breaking Changes:** Existing LiteLLM deployments unaffected
+- **Drop-in Installation:** Can be added to any existing LiteLLM database
+- **Migration Support:** Automated migration from v1.0 if needed
+- **Performance Optimized:** Partitioning, indexing, and query optimization
+
+### Schema Compatibility Benefits
+
+1. **Unified User Management:** Leverages existing LiteLLM user/team/org structure
+2. **Spend Tracking Integration:** Connection usage automatically flows to LiteLLM spend reports
+3. **Virtual Key Compatibility:** Works with LiteLLM's existing API key management
+4. **Admin Interface Ready:** Compatible with LiteLLM admin UI extensions
+5. **Monitoring Integration:** Plugs into existing LiteLLM monitoring and alerting
+
+## Complete Schema Compatibility Overview
+
+### Schema Version Comparison
+
+| Component | v1.0 (Original) | v2.0 (LiteLLM Compatible) | Compatibility Impact |
+|-----------|-----------------|---------------------------|---------------------|
+| Primary Keys | UUID (uuid_generate_v4()) | TEXT with prefixes (conn_[uuid]) | ✅ Matches LiteLLM pattern |
+| JSON Fields | JSONB | JSON | ✅ Standard LiteLLM format |
+| Foreign Keys | Basic user_id | Full LiteLLM integration | ✅ Direct table relationships |
+| Spend Tracking | Isolated | Integrated with LiteLLM_SpendLogs | ✅ Unified reporting |
+| Activity Logging | Basic logging | LiteLLM-compatible fields | ✅ Standard monitoring |
+| Model Management | Simple array | LiteLLM models pattern | ✅ Virtual key compatibility |
+
+### Core Tables (LiteLLM Extension)
 
 #### 1. LiteLLM_UserConnections
 Primary table for user-specific provider connections.
 
-**Key Fields:**
+**LiteLLM-Compatible Fields:**
 ```sql
-connection_id          TEXT PRIMARY KEY    -- Format: conn_[uuid]
-user_id               TEXT NOT NULL       -- FK to LiteLLM_UserTable
-connection_name       TEXT NOT NULL       -- User-friendly name
-provider              provider_type       -- openai, anthropic, azure, etc.
+-- Primary Key: LiteLLM prefix pattern
+connection_id          TEXT PRIMARY KEY DEFAULT ('conn_' || gen_random_uuid()::text)
+
+-- Integration Fields: Direct LiteLLM compatibility
+user_id               TEXT NOT NULL       -- References LiteLLM_UserTable.user_id
+models               TEXT[] DEFAULT '{}'  -- Follows LiteLLM_UserTable.models pattern
+spend                FLOAT DEFAULT 0.0    -- Syncs with LiteLLM_SpendLogs
+metadata             JSON DEFAULT '{}'    -- Matches LiteLLM_UserTable.metadata
+
+-- Enhanced Connection Fields
+connection_name       TEXT NOT NULL       -- User-friendly identifier
+provider              provider_type       -- openai, anthropic, azure, aws, google
 connection_type       connection_type     -- api_key, oauth, service_account
-configuration         JSON                -- Provider-specific config
-credentials_encrypted TEXT                -- Encrypted API keys/secrets
-models               TEXT[]               -- Allowed models (LiteLLM pattern)
-spend                FLOAT DEFAULT 0.0    -- Current spend (LiteLLM pattern)
-max_budget           FLOAT                -- Budget limit
-tpm_limit            BIGINT               -- Tokens per minute limit
-rpm_limit            BIGINT               -- Requests per minute limit
+configuration         JSON NOT NULL       -- Provider-specific configuration
+credentials_encrypted TEXT                -- Encrypted credentials storage
+
+-- Budget Management: LiteLLM pattern
+max_budget           FLOAT                -- Budget limit (LiteLLM compatible)
+budget_duration      TEXT                 -- daily, weekly, monthly
+budget_reset_at      TIMESTAMP WITH TIME ZONE
+
+-- Rate Limiting: LiteLLM pattern
+tpm_limit            BIGINT               -- Tokens per minute
+rpm_limit            BIGINT               -- Requests per minute
+max_parallel_requests INTEGER             -- Concurrent request limit
+
+-- Health & Performance Tracking
+last_used            TIMESTAMP WITH TIME ZONE
+last_health_check    TIMESTAMP WITH TIME ZONE
+health_status        TEXT DEFAULT 'unknown'
+usage_count          INTEGER DEFAULT 0
+error_count          INTEGER DEFAULT 0
+success_count        INTEGER DEFAULT 0
+avg_response_time_ms INTEGER
 ```
 
 #### 2. LiteLLM_AccessPolicies

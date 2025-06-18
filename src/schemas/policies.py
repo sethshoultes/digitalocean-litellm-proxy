@@ -2,7 +2,6 @@
 
 from datetime import datetime
 from typing import Any, Dict, List, Optional
-from uuid import UUID
 
 from pydantic import BaseModel, Field
 
@@ -15,7 +14,12 @@ class PolicyBase(BaseModel):
     resource_type: str = Field(default="connection")
     permissions: Dict[str, Any] = Field(default_factory=dict)
     conditions: Optional[Dict[str, Any]] = Field(default_factory=dict)
-    priority: int = Field(default=0, ge=0, le=100)
+    priority: int = Field(default=100, ge=0, le=1000)
+    models: List[str] = Field(default_factory=list)
+    max_budget: Optional[float] = None
+    tpm_limit: Optional[int] = None
+    rpm_limit: Optional[int] = None
+    budget_duration: Optional[str] = None
 
 
 class PolicyCreate(PolicyBase):
@@ -32,7 +36,7 @@ class PolicyUpdate(BaseModel):
     resource_type: Optional[str] = None
     permissions: Optional[Dict[str, Any]] = None
     conditions: Optional[Dict[str, Any]] = None
-    priority: Optional[int] = Field(None, ge=0, le=100)
+    priority: Optional[int] = Field(None, ge=0, le=1000)
     policy_metadata: Optional[Dict[str, Any]] = None
     is_active: Optional[bool] = None
 
@@ -40,7 +44,7 @@ class PolicyUpdate(BaseModel):
 class PolicyResponse(PolicyBase):
     """Policy response schema."""
 
-    policy_id: UUID
+    policy_id: str
     policy_metadata: Dict[str, Any]
     is_system_policy: bool
     is_active: bool
@@ -65,7 +69,7 @@ class UserPolicyResponse(BaseModel):
     """User policy assignment response schema."""
 
     user_id: str
-    policy_id: UUID
+    policy_id: str
     policy: PolicyResponse
     granted_by: str
     granted_at: datetime
