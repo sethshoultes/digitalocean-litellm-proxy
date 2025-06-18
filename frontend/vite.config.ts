@@ -60,7 +60,7 @@ export default defineConfig(({ command, mode }) => {
     // Development configuration
     server: {
       port: 3000,
-      host: true,
+      host: '0.0.0.0',
       open: false,
       cors: true,
       proxy: {

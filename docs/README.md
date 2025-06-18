@@ -47,6 +47,16 @@ Currently, LiteLLM administrators must manage users through disparate CLI comman
 - Decreases security incident response time by 70%
 - Enables enterprise adoption with sophisticated user management
 
+## 🚀 Live Deployment
+
+**The LiteLLM Admin Interface is now publicly accessible:**
+
+- **Frontend Dashboard**: http://64.23.251.16:3002/
+- **Backend API**: http://64.23.251.16:8001/api/v1/
+- **API Documentation**: http://64.23.251.16:8001/docs
+
+**Status**: ✅ Production Ready | 🌐 Publicly Accessible | 🔒 Secure
+
 ---
 
 ## Architecture
