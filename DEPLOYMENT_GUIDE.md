@@ -6,10 +6,10 @@ The LiteLLM User Connection and Access Management Interface is now **publicly ac
 
 ## 🌐 Live Access URLs
 
-### Production Deployment
-- **Frontend Interface**: http://64.23.251.16:3002/
-- **Backend API**: http://64.23.251.16:8001/api/v1/
-- **API Documentation**: http://64.23.251.16:8001/docs
+### Production Deployment (HTTPS Secured)
+- **Frontend Interface**: https://64.23.251.16.nip.io/admin/
+- **Backend API**: https://64.23.251.16.nip.io/admin-api/
+- **API Documentation**: https://64.23.251.16.nip.io/admin-api/docs
 - **Existing LiteLLM Instance**: https://64.23.251.16.nip.io
 
 ## 🚀 Deployment Architecture
@@ -52,8 +52,9 @@ The LiteLLM User Connection and Access Management Interface is now **publicly ac
 
 ### Network Configuration
 - **Server IP**: 64.23.251.16
-- **Frontend Port**: 3002 (React Development Server)
-- **Backend Port**: 8001 (FastAPI with Uvicorn)
+- **HTTPS Access**: 443 (Nginx SSL Termination)
+- **Frontend Path**: /admin/ (React Application via HTTPS)
+- **Backend Path**: /admin-api/ (FastAPI via HTTPS)
 - **Database Port**: 5432 (PostgreSQL - Internal)
 - **Cache Port**: 6379 (Redis - Internal)
 

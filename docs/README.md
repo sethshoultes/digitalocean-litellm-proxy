@@ -51,11 +51,11 @@ Currently, LiteLLM administrators must manage users through disparate CLI comman
 
 **The LiteLLM Admin Interface is now publicly accessible:**
 
-- **Frontend Dashboard**: http://64.23.251.16:3002/
-- **Backend API**: http://64.23.251.16:8001/api/v1/
-- **API Documentation**: http://64.23.251.16:8001/docs
+- **Frontend Dashboard**: https://64.23.251.16.nip.io/admin/
+- **Backend API**: https://64.23.251.16.nip.io/admin-api/
+- **API Documentation**: https://64.23.251.16.nip.io/admin-api/docs
 
-**Status**: ✅ Production Ready | 🌐 Publicly Accessible | 🔒 Secure
+**Status**: ✅ Production Ready | 🔐 HTTPS Encrypted | 🛡️ Enterprise Secure
 
 ---
 

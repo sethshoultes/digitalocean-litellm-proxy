@@ -8,6 +8,7 @@ export default defineConfig(({ command, mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   
   return {
+    base: env.NODE_ENV === 'production' ? '/admin/' : '/',
     plugins: [
       react(),
       VitePWA({
@@ -63,6 +64,7 @@ export default defineConfig(({ command, mode }) => {
       host: '0.0.0.0',
       open: false,
       cors: true,
+      allowedHosts: ['64.23.251.16.nip.io', 'localhost'],
       proxy: {
         '/api': {
           target: env.VITE_API_BASE_URL || 'http://localhost:8001',
