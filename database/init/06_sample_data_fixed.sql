@@ -153,7 +153,7 @@ INSERT INTO "LiteLLM_AccessPolicies" (
     'connection',
     '{"operations": ["read"], "admin": false}',
     '{}',
-    ARRAY[], -- No model access
+    ARRAY[]::TEXT[], -- No model access
     0.0,    -- No budget
     0,      -- No tokens
     10,     -- Limited requests for monitoring

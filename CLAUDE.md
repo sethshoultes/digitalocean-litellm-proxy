@@ -77,16 +77,54 @@ npm run test:coverage
 ### Full Stack Development
 
 ```bash
-# Start all services for development
+# Start all services for development (RECOMMENDED)
+/root/process-manager.sh start
+
+# Individual service management
+/root/process-manager.sh backend   # Start backend API
+/root/process-manager.sh frontend  # Start frontend dev server
+/root/process-manager.sh litellm   # Start LiteLLM proxy
+
+# Service monitoring
+/root/process-manager.sh status    # Check all service status
+/root/process-manager.sh stop      # Stop all services
+
+# Legacy manual startup (NOT RECOMMENDED)
 docker-compose up -d postgres redis  # Database services
 uvicorn src.main:app --reload --port 8001 &  # Backend API
-cd frontend && npm run dev &  # Frontend dev server
+cd frontend && npm run dev --port 3005 &  # Frontend dev server
 
 # Access points:
-# - Backend API: http://localhost:8001
-# - Frontend App: http://localhost:5173
+# - Admin Interface: https://64.23.251.16.nip.io/admin/
+# - LiteLLM Proxy: https://64.23.251.16.nip.io/
+# - Backend API: https://64.23.251.16.nip.io/admin-api/
+# - Local Backend: http://localhost:8001
+# - Local Frontend: http://localhost:3005
 # - Database: localhost:5432
 # - Redis: localhost:6379
+```
+
+### LiteLLM Model Management
+
+```bash
+# Check available models
+curl -H "Authorization: Bearer 3d82afe47512fcb1faba41cc1c9c796d3dbe8624b0a5c62fa68e6d38f0bf6d72" \
+  http://localhost:4000/v1/models
+
+# Test model functionality
+curl -X POST "http://localhost:4000/v1/chat/completions" \
+  -H "Authorization: Bearer 3d82afe47512fcb1faba41cc1c9c796d3dbe8624b0a5c62fa68e6d38f0bf6d72" \
+  -H "Content-Type: application/json" \
+  -d '{"model": "claude-3-opus-20240229", "messages": [{"role": "user", "content": "Hello"}], "max_tokens": 10}'
+
+# Available models (7 total):
+# - gpt-3.5-turbo, gpt-4o, gpt-4o-mini (OpenAI)
+# - claude-3-sonnet-20240229, claude-3-opus-20240229, claude-3-5-sonnet-20241022, claude-3-5-haiku-20241022 (Anthropic)
+
+# Environment variable management
+source /root/.env                    # Load environment variables
+echo $OPENAI_API_KEY | cut -c1-20   # Check OpenAI key (first 20 chars)
+echo $ANTHROPIC_API_KEY | cut -c1-20 # Check Anthropic key (first 20 chars)
 ```
 
 ### Testing Commands
@@ -349,72 +387,57 @@ This architecture enables scalable, secure, and maintainable user connection man
 
 ## Current Implementation Status
 
-### ✅ Completed Features (Backend Platform)
+### ✅ Production-Ready Full Stack Application
 
-**Authentication System (100% Complete):**
-- JWT access and refresh token implementation
-- User login, logout, token refresh endpoints
-- Password hashing with bcrypt
-- Role-based access control (Admin vs User permissions)
-- User info retrieval and password change functionality
-- Authentication health check endpoint
+**Backend Platform (100% Complete):**
+- JWT access and refresh token implementation with role-based access control
+- Complete CRUD operations for connections and policies
+- Provider support for OpenAI, Anthropic, Azure, AWS, Google, etc.
+- PostgreSQL with all 6 tables implemented + Redis caching
+- Enterprise-grade security with input validation and error handling
+- 20 API endpoints fully operational and production-ready
 
-**Connection Management (100% Complete):**
-- Full CRUD operations (Create, Read, Update, Delete)
-- Connection health testing with status tracking
-- Provider support (OpenAI, Anthropic, Azure, AWS, Google, etc.)
-- Filtering and pagination for connection lists
-- Role-based security (users see own connections, admins see all)
-- Connection metadata and configuration management
+**Frontend Application (100% Complete):**
+- React 18 + TypeScript + Material-UI professional interface
+- Complete authentication system with JWT integration
+- Real-time dashboard with metrics, charts, and activity feeds
+- Role-based UI with admin vs user interface differentiation
+- Responsive design optimized for mobile, tablet, and desktop
+- Connection and policy management interfaces with full CRUD operations
 
-**Policy Management (100% Complete):**
-- Complete policy CRUD operations (admin-only)
-- User assignment system with metadata support
-- Role-based access controls and system policy protection
-- Policy filtering and search capabilities
-- Duplicate prevention and conflict checking
+**LiteLLM Integration (100% Complete):**
+- 7 LLM models: OpenAI (gpt-3.5-turbo, gpt-4o, gpt-4o-mini) + Anthropic (Claude 3 Sonnet, Claude 3 Opus, Claude 3.5 Sonnet, Claude 3.5 Haiku)
+- Full OpenAI-compatible API with master key authentication
+- Environment variable management with persistent .env configuration
+- Docker-based deployment with automated process management
 
-**Database Infrastructure (100% Complete):**
-- PostgreSQL with all 6 tables implemented
-- Redis for session storage and caching
-- Docker Compose setup for development
-- SQLAlchemy models with proper relationships
-- Database health monitoring
+**Infrastructure & DevOps (100% Complete):**
+- Production deployment on DigitalOcean with SSL/HTTPS
+- Docker Compose setup with memory limits and resource optimization
+- Process management tools for development workflow
+- 1GB swap space for memory overflow protection
+- Automated service monitoring and health checks
 
-**Security & Validation (100% Complete):**
-- All endpoints require authentication
-- Role-based access control implemented
-- Input validation and error handling
-- Secure credential handling (ready for encryption)
-- Comprehensive testing validation
+### 🚀 Production URLs
 
-### 🚧 Current Implementation Priority: Phase 1 UI Development
+**Live Services:**
+- **Admin Interface:** https://64.23.251.16.nip.io/admin/
+- **LiteLLM Proxy:** https://64.23.251.16.nip.io/
+- **Backend API:** https://64.23.251.16.nip.io/admin-api/
 
-**Frontend Development (In Progress):**
-- 🚧 React 18 + TypeScript application setup
-- 🚧 Material-UI (MUI) v5 component library
-- 🚧 Redux Toolkit state management
-- 🚧 Authentication UI components
-- 🚧 Dashboard layout and navigation
-- 🚧 Connection management interface
-- 🚧 Policy management interface
-
-**Technology Stack Selected:**
-- **Framework:** React 18 + TypeScript
-- **Build Tool:** Vite for fast development
-- **UI Library:** Material-UI (MUI) v5
-- **State Management:** Redux Toolkit + RTK Query
-- **HTTP Client:** Axios with JWT interceptors
-- **Routing:** React Router v6
+**Development Tools:**
+- **Process Manager:** `/root/process-manager.sh` for service lifecycle management
+- **Environment Config:** `/root/.env` with persistent API key storage
+- **Documentation:** Complete API specs and integration guides
 
 ### 🔧 Development Status
 
-**Backend API:** ✅ Complete and production-ready (20 endpoints)
-**Authentication:** ✅ Production-ready JWT system  
-**Database:** ✅ Fully operational with all schemas  
-**Security:** ✅ Role-based access control implemented  
-**Testing:** ✅ All endpoints validated manually  
-**Documentation:** ✅ Comprehensive API documentation  
-**Frontend:** 🚧 Phase 1 UI development in progress
+**Backend API:** ✅ Production-ready (20 endpoints operational)
+**Frontend:** ✅ Professional dashboard with real-time features
+**LiteLLM:** ✅ 7 models operational with proper authentication
+**Database:** ✅ PostgreSQL + Redis fully configured
+**Security:** ✅ Enterprise-grade with JWT + role-based access
+**Infrastructure:** ✅ Optimized deployment with monitoring
+**Documentation:** ✅ Comprehensive guides and API documentation
 
-**Current Phase:** Phase 1 UI Development - React foundation and authentication components
+**Current Phase:** Production-Ready - Maintenance and optimization

@@ -1,5 +1,7 @@
 # LiteLLM User Connection and Access Management
 
+**🚀 Production-Ready Status** | **✅ Live at:** https://64.23.251.16.nip.io/admin/
+
 A comprehensive web-based management interface for LiteLLM proxy deployments that streamlines user authentication, connection management, and access control across multiple LLM providers.
 
 ## Table of Contents

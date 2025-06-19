@@ -1,0 +1,32 @@
+-- Create connection activity table without partitioning for simplicity
+CREATE TABLE IF NOT EXISTS "LiteLLM_ConnectionActivity" (
+    "activity_id" TEXT PRIMARY KEY DEFAULT ('activity_' || gen_random_uuid()::text),
+    "connection_id" TEXT NOT NULL,
+    "user_id" TEXT,
+    "activity_type" activity_type NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'success',
+    "request_id" TEXT,
+    "api_key" TEXT,
+    "model" TEXT,
+    "model_group" TEXT,
+    "custom_llm_provider" TEXT,
+    "api_base" TEXT,
+    "total_tokens" INTEGER DEFAULT 0,
+    "prompt_tokens" INTEGER DEFAULT 0,
+    "completion_tokens" INTEGER DEFAULT 0,
+    "spend" FLOAT DEFAULT 0.0,
+    "response_time_ms" INTEGER,
+    "status_code" INTEGER,
+    "error_message" TEXT,
+    "metadata" JSON DEFAULT '{}',
+    "request_tags" JSON DEFAULT '[]',
+    "ip_address" INET,
+    "user_agent" TEXT,
+    "timestamp" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    "startTime" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    "endTime" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    
+    CONSTRAINT valid_status CHECK (status IN ('success', 'failure', 'pending', 'timeout', 'error')),
+    CONSTRAINT valid_tokens CHECK (total_tokens >= 0 AND prompt_tokens >= 0 AND completion_tokens >= 0),
+    CONSTRAINT valid_spend CHECK (spend >= 0)
+);
