@@ -76,6 +76,12 @@ class Settings(BaseSettings):
         default="litellm-config.yaml", env="LITELLM_CONFIG_PATH"
     )
     litellm_proxy_url: Optional[str] = Field(default=None, env="LITELLM_PROXY_URL")
+    
+    # LiteLLM Admin UI Configuration
+    ui_username: Optional[str] = Field(default=None, env="UI_USERNAME")
+    ui_password: Optional[str] = Field(default=None, env="UI_PASSWORD")
+    litellm_salt_key: Optional[str] = Field(default=None, env="LITELLM_SALT_KEY")
+    litellm_mode: str = Field(default="DEVELOPMENT", env="LITELLM_MODE")
 
     # External API keys (for testing and validation)
     openai_api_key: Optional[str] = Field(default=None, env="OPENAI_API_KEY")

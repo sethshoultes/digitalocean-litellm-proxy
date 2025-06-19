@@ -52,13 +52,10 @@ start_litellm() {
     # Load environment variables
     source /root/.env
     
-    # Start LiteLLM in Docker with working configuration
-    docker run -d --name litellm-working -p $LITELLM_PORT:$LITELLM_PORT \
-        -v $(pwd)/litellm-working.yaml:/app/config.yaml \
-        ghcr.io/berriai/litellm:main-latest \
-        --config /app/config.yaml --port $LITELLM_PORT --host 0.0.0.0 > litellm.log 2>&1
+    # Start LiteLLM locally with fixed configuration and environment variables
+    nohup env OPENAI_API_KEY="$OPENAI_API_KEY" ANTHROPIC_API_KEY="$ANTHROPIC_API_KEY" LITELLM_MASTER_KEY="$LITELLM_MASTER_KEY" litellm --config /root/litellm-fixed.yaml --port $LITELLM_PORT > litellm.log 2>&1 &
     
-    echo "LiteLLM started in Docker container"
+    echo "LiteLLM started locally with all 7 models"
 }
 
 # Function to stop all services

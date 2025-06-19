@@ -31,3 +31,6 @@ model_list:
 general_settings:
   master_key: 3d82afe47512fcb1faba41cc1c9c796d3dbe8624b0a5c62fa68e6d38f0bf6d72
   allow_requests_on_db_unavailable: True
+  ui_username: "seth@caseproof.com"
+  ui_password: "YUH6pyj*wqj2cpw!fkr"
+  store_model_in_db: false
