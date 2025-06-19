@@ -31,6 +31,6 @@ model_list:
 general_settings:
   master_key: os.environ/LITELLM_MASTER_KEY
   allow_requests_on_db_unavailable: True
-  ui_username: "seth@caseproof.com"
-  ui_password: "YUH6pyj*wqj2cpw!fkr"
+  ui_username: os.environ/UI_USERNAME
+  ui_password: os.environ/UI_PASSWORD
   store_model_in_db: false
